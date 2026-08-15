@@ -8,6 +8,21 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
 
+    <!-- Android TV / Leanback support -->
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+
+    <!-- ONN/Android TV does not have a touchscreen -->
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+
+    <!-- Physical controller is supported but not mandatory for installation -->
+    <uses-feature
+        android:name="android.hardware.gamepad"
+        android:required="false" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -24,24 +39,33 @@
             android:exported="false">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/filepaths"
-                />
+                android:resource="@xml/filepaths" />
         </provider>
 
-        <activity android:name=".main.MainActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+        <activity
+            android:name=".main.MainActivity"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize"
             android:exported="true">
+
+            <!-- Normal Android launcher -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Android TV / Leanback launcher -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+
         </activity>
 
         <activity
             android:name=".stream.StreamActivity"
             android:theme="@style/StreamTheme"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:screenOrientation="userLandscape"/>
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name=".settings.SettingsActivity" />
@@ -52,18 +76,19 @@
         <activity
             android:name=".regist.RegistActivity"
             android:theme="@style/MageTheme"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:windowSoftInputMode="adjustResize"/>
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".regist.RegistExecuteActivity"
             android:theme="@style/MageTheme"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize" />
 
         <activity
             android:name=".manualconsole.EditManualConsoleActivity"
             android:theme="@style/MageTheme"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize" />
+
     </application>
 
 </manifest>
