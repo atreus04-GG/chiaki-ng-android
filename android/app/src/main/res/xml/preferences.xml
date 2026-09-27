@@ -21,7 +21,7 @@
         <SwitchPreference
             app:key="preferences_experimental_touch_controls_enabled"
             app:title="Experimental Motion / Fire Controls"
-            app:summary="Show the blue motion arrows and Fire & Drag aiming control"
+            app:summary="Show the blue motion arrows and Fire &amp; Drag aiming control"
             app:defaultValue="false"
             app:icon="@drawable/ic_motion" />
 
