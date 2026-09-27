@@ -96,7 +96,7 @@ class Preferences(context: Context)
 
 	val debandingEnabledKey get() = resources.getString(R.string.preferences_debanding_key)
 	var debandingEnabled
-		get() = sharedPreferences.getBoolean(debandingEnabledKey, true)
+		get() = sharedPreferences.getBoolean(debandingEnabledKey, false)
 		set(value) { sharedPreferences.edit().putBoolean(debandingEnabledKey, value).apply() }
 
 	val touchscreenTouchpadEnabledKey get() = "preferences_touchscreen_touchpad_enabled"

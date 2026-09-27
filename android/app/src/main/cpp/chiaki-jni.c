@@ -271,6 +271,7 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
 	connect_info.video_profile.codec = (ChiakiCodec)target_value;
 
 	connect_info.video_profile_auto_downgrade = true;
+	connect_info.enable_idr_on_fec_failure = true;
 
 	session = CHIAKI_NEW(AndroidChiakiSession);
 	if(!session)
