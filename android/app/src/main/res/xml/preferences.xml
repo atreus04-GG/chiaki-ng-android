@@ -19,6 +19,13 @@
             android:summary="Move and toggle on-screen buttons; positions are saved" />
 
         <SwitchPreference
+            app:key="preferences_experimental_touch_controls_enabled"
+            app:title="Experimental Motion / Fire Controls"
+            app:summary="Show the blue motion arrows and Fire & Drag aiming control"
+            app:defaultValue="false"
+            app:icon="@drawable/ic_motion" />
+
+        <SwitchPreference
             app:key="@string/preferences_swap_cross_moon_key"
             app:title="@string/preferences_swap_cross_moon_title"
             app:summary="@string/preferences_swap_cross_moon_summary"

@@ -246,8 +246,11 @@ class DefaultTouchControlsFragment : TouchControlsFragment() {
             "fireDragButton" to binding.fireDragButton
         )
 
+        val experimentalControlsEnabled = Preferences(requireContext()).experimentalTouchControlsEnabled
+
         mapping.forEach { (idStr, v) ->
-            val visible = TouchLayoutPrefs.getButtonVisible(requireContext(), idStr, true)
+            val savedVisible = TouchLayoutPrefs.getButtonVisible(requireContext(), idStr, true)
+            val visible = experimentalControlsEnabled && savedVisible
             v.visibility = if (visible) View.VISIBLE else View.GONE
 
             val (xFrac, yFrac) = TouchLayoutPrefs.getButtonPos(requireContext(), idStr)

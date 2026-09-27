@@ -104,6 +104,11 @@ class Preferences(context: Context)
 		get() = sharedPreferences.getBoolean(touchscreenTouchpadEnabledKey, false)
 		set(value) { sharedPreferences.edit().putBoolean(touchscreenTouchpadEnabledKey, value).apply() }
 
+	val experimentalTouchControlsEnabledKey get() = "preferences_experimental_touch_controls_enabled"
+	var experimentalTouchControlsEnabled
+		get() = sharedPreferences.getBoolean(experimentalTouchControlsEnabledKey, false)
+		set(value) { sharedPreferences.edit().putBoolean(experimentalTouchControlsEnabledKey, value).apply() }
+
 	// Mapping Keys
 	fun getMappingKey(buttonName: String) = "mapping_$buttonName"
 	
