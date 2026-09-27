@@ -145,8 +145,14 @@ bool android_chiaki_video_decoder_video_sample(uint8_t *buf, size_t buf_size,
                                                int32_t frames_lost,
                                                bool frame_recovered,
                                                void *user) {
-  (void)frames_lost;     // unused
-  (void)frame_recovered; // unused
+  static uint64_t input_sample_count = 0;
+  input_sample_count++;
+  if ((input_sample_count % 120) == 0 || frames_lost > 0 || frame_recovered) {
+    CHIAKI_LOGI(((AndroidChiakiVideoDecoder *)user)->log,
+                "VIDEO_DIAG input samples=%llu size=%zu lost=%d recovered=%d",
+                (unsigned long long)input_sample_count, buf_size,
+                (int)frames_lost, frame_recovered ? 1 : 0);
+  }
   bool r = true;
   AndroidChiakiVideoDecoder *decoder = user;
   chiaki_mutex_lock(&decoder->codec_mutex);
@@ -194,11 +200,19 @@ beach:
 
 static void *android_chiaki_video_decoder_output_thread_func(void *user) {
   AndroidChiakiVideoDecoder *decoder = user;
+  uint64_t output_buffer_count = 0;
 
   while (1) {
     AMediaCodecBufferInfo info;
     ssize_t status = AMediaCodec_dequeueOutputBuffer(decoder->codec, &info, -1);
     if (status >= 0) {
+      output_buffer_count++;
+      if ((output_buffer_count % 120) == 0) {
+        CHIAKI_LOGI(decoder->log,
+                    "VIDEO_DIAG output buffers=%llu size=%d flags=0x%x",
+                    (unsigned long long)output_buffer_count,
+                    (int)info.size, (unsigned int)info.flags);
+      }
       AMediaCodec_releaseOutputBuffer(decoder->codec, (size_t)status,
                                       info.size != 0);
       if (info.flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) {
