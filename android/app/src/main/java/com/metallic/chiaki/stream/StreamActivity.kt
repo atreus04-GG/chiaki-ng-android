@@ -102,8 +102,9 @@ class StreamActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListe
 			showOverlay()
 		}
 
-// Setup video output based on debanding preference
-		setupVideoOutput()
+// Diagnostic: bypass custom OpenGL debanding renderer and use the
+		// standard Android SurfaceView directly.
+		setupDirectVideoOutput()
 		
 		val prefs = Preferences(this)
 		if (prefs.touchscreenTouchpadEnabled) {
@@ -136,6 +137,13 @@ class StreamActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListe
 	}
 
 	private var debandRenderer: DebandRenderer? = null
+
+	private fun setupDirectVideoOutput() {
+		viewModel.session.detachSurface()
+		binding.debandSurfaceView.visibility = View.GONE
+		binding.surfaceView.visibility = View.VISIBLE
+		viewModel.session.attachToSurfaceView(binding.surfaceView)
+	}
 
 	private fun setupVideoOutput() {
 		val prefs = Preferences(this)
@@ -192,7 +200,7 @@ class StreamActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListe
 	{
 		super.onResume()
 		hideSystemUI()
-		if (Preferences(this).debandingEnabled) {
+		if (debandRenderer != null) {
 			binding.debandSurfaceView.onResume()
 		}
 		viewModel.session.resume()
@@ -201,7 +209,7 @@ class StreamActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListe
 	override fun onPause()
 	{
 		super.onPause()
-		if (Preferences(this).debandingEnabled) {
+		if (debandRenderer != null) {
 			binding.debandSurfaceView.onPause()
 		}
 		viewModel.session.pause()
