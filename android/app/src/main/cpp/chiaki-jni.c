@@ -268,7 +268,8 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
 	jobject codec_obj = E->GetObjectField(env, connect_video_profile_obj, E->GetFieldID(env, connect_video_profile_class, "codec", "L"BASE_PACKAGE"/Codec;"));
 	jclass codec_class = E->GetObjectClass(env, codec_obj);
 	jint target_value = E->GetIntField(env, codec_obj, E->GetFieldID(env, codec_class, "value", "I"));
-	connect_info.video_profile.codec = (ChiakiCodec)target_value;
+	connect_info.video_profile.codec = CHIAKI_CODEC_H264;
+	CHIAKI_LOGI(log, "VIDEO_DIAG forcing H.264 codec for surface-isolation test");
 
 	connect_info.video_profile_auto_downgrade = true;
 	connect_info.enable_idr_on_fec_failure = true;

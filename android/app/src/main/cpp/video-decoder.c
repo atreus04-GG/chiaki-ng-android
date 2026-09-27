@@ -208,13 +208,22 @@ static void *android_chiaki_video_decoder_output_thread_func(void *user) {
     if (status >= 0) {
       output_buffer_count++;
       if ((output_buffer_count % 120) == 0) {
+        int32_t window_width = decoder->window ? ANativeWindow_getWidth(decoder->window) : -1;
+        int32_t window_height = decoder->window ? ANativeWindow_getHeight(decoder->window) : -1;
         CHIAKI_LOGI(decoder->log,
-                    "VIDEO_DIAG output buffers=%llu size=%d flags=0x%x",
+                    "VIDEO_DIAG output buffers=%llu size=%d flags=0x%x surface=%dx%d",
                     (unsigned long long)output_buffer_count,
-                    (int)info.size, (unsigned int)info.flags);
+                    (int)info.size, (unsigned int)info.flags,
+                    window_width, window_height);
       }
-      AMediaCodec_releaseOutputBuffer(decoder->codec, (size_t)status,
-                                      info.size != 0);
+      media_status_t present_status =
+          AMediaCodec_releaseOutputBuffer(decoder->codec, (size_t)status,
+                                          info.size != 0);
+      if (present_status != AMEDIA_OK) {
+        CHIAKI_LOGE(decoder->log,
+                    "VIDEO_DIAG releaseOutputBuffer failed status=%d buffer=%zd size=%d",
+                    (int)present_status, status, (int)info.size);
+      }
       if (info.flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) {
         CHIAKI_LOGI(decoder->log, "AMediaCodec reported EOS");
         break;
