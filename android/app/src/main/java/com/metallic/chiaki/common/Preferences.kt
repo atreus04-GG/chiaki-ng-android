@@ -177,15 +177,6 @@ class Preferences(context: Context)
 		get() = sharedPreferences.getInt(sharpnessIntensityKey, 0).toFloat() / 100f
 		set(value) { sharedPreferences.edit().putInt(sharpnessIntensityKey, (value * 100f).toInt()).apply() }
 
-	val fireDragSensitivityKey get() = resources.getString(R.string.preferences_fire_drag_sensitivity_key)
-	var fireDragSensitivity: Float
-		get() = sharedPreferences.getInt(fireDragSensitivityKey, 15).coerceIn(5, 50) / 1000f
-		set(value) {
-			sharedPreferences.edit()
-				.putInt(fireDragSensitivityKey, (value * 1000f).toInt().coerceIn(5, 50))
-				.apply()
-		}
-
 	val resolutionKey get() = resources.getString(R.string.preferences_resolution_key)
 	var resolution
 		get() = sharedPreferences.getString(resolutionKey, resolutionDefault.value)?.let { value ->

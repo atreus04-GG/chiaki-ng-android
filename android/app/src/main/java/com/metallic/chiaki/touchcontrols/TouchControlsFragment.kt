@@ -5,7 +5,6 @@ package com.metallic.chiaki.touchcontrols
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.os.SystemClock
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -71,27 +70,6 @@ class DefaultTouchControlsFragment : TouchControlsFragment() {
     private val NEUTRAL_GYRO = 0.0f
     private val NEUTRAL_ORIENT_W = 1.0f
 
-    // Fire & Drag - continuous velocity/accumulator aiming model
-    private val PUBLISH_INTERVAL_MS = 8L
-    private val INACTIVITY_TIMEOUT_MS = 30L
-    private val FIRE_SMOOTHING = 0.55f
-
-    // aim velocity state (accumulator, clamped to [-1, 1])
-    @Volatile
-    private var aimX = 0f
-    @Volatile
-    private var aimY = 0f
-    @Volatile
-    private var smoothedX = 0f
-    @Volatile
-    private var smoothedY = 0f
-    @Volatile
-    private var lastMoveTime = 0L
-    @Volatile
-    private var isAimActive = false
-
-    private var publisherRunnable: Runnable? = null
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentControlsBinding.inflate(inflater, container, false).let {
             _binding = it
@@ -124,60 +102,6 @@ class DefaultTouchControlsFragment : TouchControlsFragment() {
         binding.leftAnalogStickView.stateChangedCallback = { ownControllerState = ownControllerState.copy().apply { leftX = quantizeStick(it.x); leftY = quantizeStick(it.y) } }
         binding.rightAnalogStickView.stateChangedCallback = { ownControllerState = ownControllerState.copy().apply { rightX = quantizeStick(it.x); rightY = quantizeStick(it.y) } }
 
-        // Fire & Drag continuous free-drag implementation (velocity accumulator)
-        binding.fireDragButton.setListener(object : FireDragView.Listener {
-            override fun onHoldStart(startRawX: Float, startRawY: Float) {
-                // Start aim gesture
-                aimX = 0f
-                aimY = 0f
-                smoothedX = 0f
-                smoothedY = 0f
-                lastMoveTime = SystemClock.uptimeMillis()
-                isAimActive = true
-
-                // Immediately hold triggers and center stick
-                ownControllerState = ownControllerState.copy().apply {
-                    l2State = 255U
-                    r2State = 255U
-                    rightX = 0
-                    rightY = 0
-                }
-
-                startPublisher()
-            }
-
-            override fun onDrag(dx: Float, dy: Float) {
-                if (!isAimActive) return
-                // Accumulate velocity from relative raw deltas
-                val sensitivity = Preferences(requireContext()).fireDragSensitivity
-                aimX += dx * sensitivity
-                aimY += dy * sensitivity
-                // Clamp
-                aimX = aimX.coerceIn(-1f, 1f)
-                aimY = aimY.coerceIn(-1f, 1f)
-                lastMoveTime = SystemClock.uptimeMillis()
-                // Do NOT publish here; publisherRunnable is responsible for continuous publishing
-            }
-
-            override fun onHoldEnd() {
-                // End aim gesture
-                isAimActive = false
-                cancelPublisher()
-                aimX = 0f
-                aimY = 0f
-                smoothedX = 0f
-                smoothedY = 0f
-                lastMoveTime = 0L
-
-                ownControllerState = ownControllerState.copy().apply {
-                    l2State = 0U
-                    r2State = 0U
-                    rightX = 0
-                    rightY = 0
-                }
-            }
-        })
-
         // Motion buttons (ensure layout IDs present)
         setupMotionButton(binding.motionUpButton, MotionDir.UP, "motionUpButton")
         setupMotionButton(binding.motionDownButton, MotionDir.DOWN, "motionDownButton")
@@ -192,58 +116,12 @@ class DefaultTouchControlsFragment : TouchControlsFragment() {
         })
     }
 
-    private fun startPublisher() {
-        if (publisherRunnable != null) return
-        publisherRunnable = object : Runnable {
-            override fun run() {
-                if (!isAimActive) return
-                val now = SystemClock.uptimeMillis()
-                val age = if (lastMoveTime == 0L) Long.MAX_VALUE else (now - lastMoveTime)
-                if (age > INACTIVITY_TIMEOUT_MS) {
-                    smoothedX = 0f
-                    smoothedY = 0f
-                    ownControllerState = ownControllerState.copy().apply {
-                        rightX = 0
-                        rightY = 0
-                        l2State = 255U
-                        r2State = 255U
-                    }
-                } else {
-                    smoothedX += (aimX - smoothedX) * FIRE_SMOOTHING
-                    smoothedY += (aimY - smoothedY) * FIRE_SMOOTHING
-                    val qx = (Short.MAX_VALUE * smoothedX).toInt().toShort()
-                    val qy = (Short.MAX_VALUE * smoothedY).toInt().toShort()
-                    ownControllerState = ownControllerState.copy().apply {
-                        rightX = qx
-                        rightY = qy
-                        l2State = 255U
-                        r2State = 255U
-                    }
-                }
-                motionHandler.postDelayed(this, PUBLISH_INTERVAL_MS)
-            }
-        }
-        motionHandler.post(publisherRunnable!!)
-    }
-
-    private fun cancelPublisher() {
-        publisherRunnable?.let { motionHandler.removeCallbacks(it) }
-        publisherRunnable = null
-    }
-
-    override fun onDestroyView() {
-        // Ensure no stale callbacks remain
-        cancelPublisher()
-        super.onDestroyView()
-    }
-
     private fun applySavedLayoutToViews() {
         val mapping = mapOf(
             "motionUpButton" to binding.motionUpButton,
             "motionDownButton" to binding.motionDownButton,
             "motionLeftButton" to binding.motionLeftButton,
-            "motionRightButton" to binding.motionRightButton,
-            "fireDragButton" to binding.fireDragButton
+            "motionRightButton" to binding.motionRightButton
         )
 
         val experimentalControlsEnabled = Preferences(requireContext()).experimentalTouchControlsEnabled

@@ -9,7 +9,6 @@ import android.graphics.Matrix
 import android.os.*
 import android.view.*
 import android.widget.EditText
-import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -27,7 +26,6 @@ import com.metallic.chiaki.touchcontrols.DefaultTouchControlsFragment
 import com.metallic.chiaki.touchcontrols.TouchControlsFragment
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
-import java.util.Locale
 import kotlin.math.min
 
 private sealed class DialogContents
@@ -47,6 +45,7 @@ class StreamActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListe
 	private lateinit var binding: ActivityStreamBinding
 
 	private val uiVisibilityHandler = Handler()
+	private var streamMenuVisible = false
 
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
@@ -78,24 +77,7 @@ class StreamActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListe
 			showOverlay()
 		}
 
-		binding.resumeStreamButton.setOnClickListener { hideStreamMenu() }
-		binding.streamSettingsButton.setOnClickListener { showStreamSettings() }
-		binding.stopPlayingButton.setOnClickListener {
-			hideStreamMenu()
-			viewModel.session.shutdown()
-		}
-		binding.returnToStreamMenuButton.setOnClickListener { showStreamMenu() }
-		binding.fireDragSensitivitySeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-			override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-				if(fromUser) {
-					Preferences(this@StreamActivity).fireDragSensitivity = (progress + 5) / 1000f
-					updateFireDragSensitivityValue()
-				}
-			}
-
-			override fun onStartTrackingTouch(seekBar: SeekBar) = Unit
-			override fun onStopTrackingTouch(seekBar: SeekBar) = Unit
-		})
+		binding.closeSessionButton.setOnClickListener { showDisconnectSessionDialog() }
 
 		binding.displayModeToggle.addOnButtonCheckedListener { _, _, _ ->
 			adjustStreamViewAspect()
@@ -224,6 +206,8 @@ class StreamActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListe
 
 	override fun onSystemUiVisibilityChange(visibility: Int)
 	{
+		if(streamMenuVisible)
+			return
 		if(visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0)
 			showOverlay()
 		else
@@ -261,40 +245,41 @@ class StreamActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListe
 
 	private fun showStreamMenu()
 	{
-		binding.streamMenuOverlay.isVisible = true
-		binding.streamMenu.isVisible = true
-		binding.streamSettings.isGone = true
+		streamMenuVisible = true
+		showOverlay()
+		uiVisibilityHandler.removeCallbacks(hideSystemUIRunnable)
 	}
 
 	private fun hideStreamMenu()
 	{
-		binding.streamMenuOverlay.isGone = true
-		binding.streamSettings.isGone = true
+		streamMenuVisible = false
+		hideOverlay()
 	}
 
-	private fun showStreamSettings()
+	private fun showDisconnectSessionDialog()
 	{
-		val sensitivity = Preferences(this).fireDragSensitivity
-		binding.fireDragSensitivitySeekBar.progress = (sensitivity * 1000f).toInt() - 5
-		updateFireDragSensitivityValue()
-		binding.streamMenu.isGone = true
-		binding.streamSettings.isVisible = true
-		binding.streamMenuOverlay.isVisible = true
-	}
-
-	private fun updateFireDragSensitivityValue()
-	{
-		binding.fireDragSensitivityValue.text =
-			String.format(Locale.US, "%.3f", Preferences(this).fireDragSensitivity)
+		MaterialAlertDialogBuilder(this)
+			.setTitle(R.string.dialog_title_disconnect_session)
+			.setMessage(R.string.dialog_message_rest_mode)
+			.setPositiveButton(R.string.action_rest_mode) { _, _ ->
+				hideStreamMenu()
+				viewModel.session.shutdown(sleep = true)
+				finish()
+			}
+			.setNegativeButton(R.string.action_no) { _, _ ->
+				hideStreamMenu()
+				viewModel.session.shutdown()
+				finish()
+			}
+			.show()
 	}
 
 	override fun onBackPressed()
 	{
-		when {
-			binding.streamSettings.isVisible -> showStreamMenu()
-			binding.streamMenuOverlay.isVisible -> hideStreamMenu()
-			else -> showStreamMenu()
-		}
+		if(streamMenuVisible)
+			hideStreamMenu()
+		else
+			showStreamMenu()
 	}
 
 	override fun onWindowFocusChanged(hasFocus: Boolean)

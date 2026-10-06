@@ -38,8 +38,10 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 		}
 	}
 
-	fun shutdown()
+	fun shutdown(sleep: Boolean = false)
 	{
+		if(sleep)
+			session?.goToBed()
 		session?.stop()
 		session?.dispose()
 		session = null

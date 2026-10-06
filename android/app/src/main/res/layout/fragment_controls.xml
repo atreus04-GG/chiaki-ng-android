@@ -314,14 +314,4 @@
         android:layout_marginRight="40dp"
         android:layout_marginTop="16dp" />
 
-    <!-- Fire & Drag prototype control -->
-    <com.metallic.chiaki.touchcontrols.FireDragView
-        android:id="@+id/fireDragButton"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginRight="24dp"
-        android:layout_marginBottom="140dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

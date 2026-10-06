@@ -398,6 +398,13 @@ JNIEXPORT jint JNICALL JNI_FCN(sessionStop)(JNIEnv *env, jobject obj, jlong ptr)
 	return chiaki_session_stop(&session->session);
 }
 
+JNIEXPORT jint JNICALL JNI_FCN(sessionGoToBed)(JNIEnv *env, jobject obj, jlong ptr)
+{
+	AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;
+	CHIAKI_LOGI(session->log, "Send Console to Rest Mode");
+	return chiaki_session_goto_bed(&session->session);
+}
+
 JNIEXPORT jint JNICALL JNI_FCN(sessionJoin)(JNIEnv *env, jobject obj, jlong ptr)
 {
 	AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;

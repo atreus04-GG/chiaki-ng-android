@@ -20,8 +20,8 @@
 
         <SwitchPreference
             app:key="preferences_experimental_touch_controls_enabled"
-            app:title="Experimental Motion / Fire Controls"
-            app:summary="Show the blue motion arrows and Fire &amp; Drag aiming control"
+            app:title="Experimental Motion Controls"
+            app:summary="Show the blue motion arrow controls"
             app:defaultValue="false"
             app:icon="@drawable/ic_motion" />
 
@@ -96,12 +96,6 @@
             app:summary="%s"
             app:icon="@drawable/ic_codec"/>
 
-        <SeekBarPreference
-            app:key="@string/preferences_fire_drag_sensitivity_key"
-            app:title="@string/preferences_fire_drag_sensitivity_title"
-            app:min="5"
-            android:max="50"
-            app:defaultValue="15" />
     </PreferenceCategory>
 
     <PreferenceCategory

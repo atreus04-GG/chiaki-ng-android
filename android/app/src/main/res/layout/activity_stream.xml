@@ -60,11 +60,21 @@
             android:clickable="true"
             android:focusable="false">
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/closeSessionButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/action_close_session"
+                android:textColor="@color/stream_text"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/onScreenControlsSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@id/closeSessionButton"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:text="On-Screen Controls"
                 app:switchPadding="8dp"
@@ -112,77 +122,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
-
-<FrameLayout
-    android:id="@+id/streamMenuOverlay"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#99000000"
-    android:clickable="true"
-    android:focusable="true"
-    android:visibility="gone">
-
-    <LinearLayout
-        android:id="@+id/streamMenu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical"
-        android:padding="24dp">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/resumeStreamButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/action_resume" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/streamSettingsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/action_settings" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/stopPlayingButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/action_stop_playing" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/streamSettings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical"
-        android:padding="24dp"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/preferences_fire_drag_sensitivity_title"
-            android:textColor="@color/stream_text" />
-
-        <TextView
-            android:id="@+id/fireDragSensitivityValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/stream_text" />
-
-        <SeekBar
-            android:id="@+id/fireDragSensitivitySeekBar"
-            android:layout_width="240dp"
-            android:layout_height="wrap_content"
-            android:max="45" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/returnToStreamMenuButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/action_return_to_menu" />
-    </LinearLayout>
-</FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

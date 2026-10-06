@@ -75,7 +75,6 @@
     <string name="preferences_fps_title">FPS</string>
     <string name="preferences_bitrate_title">Bitrate</string>
     <string name="preferences_codec_title">Codec</string>
-    <string name="preferences_fire_drag_sensitivity_title">Fire &amp; Drag Sensitivity</string>
     <string name="preferences_log_verbose_title">Verbose Logging</string>
     <string name="preferences_log_verbose_summary">Warning: This logs a LOT! Don\'t enable for regular use.</string>
     <string name="preferences_resolution_title_360p">360p</string>
@@ -122,8 +121,9 @@
     <string name="preferences_bitrate_key">stream_bitrate</string>
     <string name="preferences_codec_key">stream_codec</string>
     <string name="preferences_debanding_key">stream_debanding</string>
-    <string name="preferences_fire_drag_sensitivity_key">preferences_fire_drag_sensitivity</string>
-    <string name="action_resume">Resume</string>
-    <string name="action_stop_playing">Stop Playing</string>
-    <string name="action_return_to_menu">Return to Menu</string>
+    <string name="action_close_session">Close</string>
+    <string name="dialog_title_disconnect_session">Disconnect Session</string>
+    <string name="dialog_message_rest_mode">Do you want the Console to go into rest mode?</string>
+    <string name="action_rest_mode">Rest Mode</string>
+    <string name="action_no">No</string>
 </resources>
