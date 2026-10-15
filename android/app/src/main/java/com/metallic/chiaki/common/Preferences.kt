@@ -99,6 +99,16 @@ class Preferences(context: Context)
 		get() = sharedPreferences.getBoolean(debandingEnabledKey, false)
 		set(value) { sharedPreferences.edit().putBoolean(debandingEnabledKey, value).apply() }
 
+	val fsr1EnabledKey get() = resources.getString(R.string.preferences_fsr1_key)
+	var fsr1Enabled
+		get() = sharedPreferences.getBoolean(fsr1EnabledKey, false)
+		set(value) { sharedPreferences.edit().putBoolean(fsr1EnabledKey, value).apply() }
+
+	val fsr1RcasEnabledKey get() = resources.getString(R.string.preferences_fsr1_rcas_key)
+	var fsr1RcasEnabled
+		get() = sharedPreferences.getBoolean(fsr1RcasEnabledKey, true)
+		set(value) { sharedPreferences.edit().putBoolean(fsr1RcasEnabledKey, value).apply() }
+
 	val touchscreenTouchpadEnabledKey get() = "preferences_touchscreen_touchpad_enabled"
 	var touchscreenTouchpadEnabled
 		get() = sharedPreferences.getBoolean(touchscreenTouchpadEnabledKey, false)

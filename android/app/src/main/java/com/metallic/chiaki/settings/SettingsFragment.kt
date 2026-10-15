@@ -29,6 +29,8 @@ class DataStore(val preferences: Preferences): PreferenceDataStore()
 		preferences.motionEnabledKey -> preferences.motionEnabled
 		preferences.buttonHapticEnabledKey -> preferences.buttonHapticEnabled
 		preferences.debandingEnabledKey -> preferences.debandingEnabled
+		preferences.fsr1EnabledKey -> preferences.fsr1Enabled
+		preferences.fsr1RcasEnabledKey -> preferences.fsr1RcasEnabled
 		preferences.touchscreenTouchpadEnabledKey -> preferences.touchscreenTouchpadEnabled
 		preferences.experimentalTouchControlsEnabledKey -> preferences.experimentalTouchControlsEnabled
 		else -> defValue
@@ -44,6 +46,8 @@ class DataStore(val preferences: Preferences): PreferenceDataStore()
 			preferences.motionEnabledKey -> preferences.motionEnabled = value
 			preferences.buttonHapticEnabledKey -> preferences.buttonHapticEnabled = value
 			preferences.debandingEnabledKey -> preferences.debandingEnabled = value
+			preferences.fsr1EnabledKey -> preferences.fsr1Enabled = value
+			preferences.fsr1RcasEnabledKey -> preferences.fsr1RcasEnabled = value
 			preferences.touchscreenTouchpadEnabledKey -> preferences.touchscreenTouchpadEnabled = value
 			preferences.experimentalTouchControlsEnabledKey -> preferences.experimentalTouchControlsEnabled = value
 		}

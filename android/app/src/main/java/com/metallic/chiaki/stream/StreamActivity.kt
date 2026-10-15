@@ -84,7 +84,7 @@ class StreamActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListe
 			showOverlay()
 		}
 
-		// Direct SurfaceView is the stable default. Debanding/RCAS remains optional.
+		// Direct SurfaceView is the default; post-processing is opt-in.
 		setupVideoOutput()
 		
 		val prefs = Preferences(this)
@@ -118,32 +118,46 @@ class StreamActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListe
 	}
 
 	private var debandRenderer: DebandRenderer? = null
+	private var directOutputAttached = false
 
 	private fun setupVideoOutput() {
 		val prefs = Preferences(this)
 		viewModel.session.detachSurface()
-		
-		if (prefs.debandingEnabled) {
-			// Use GLSurfaceView with debanding shader
+		val glEs3 = (getSystemService(android.content.Context.ACTIVITY_SERVICE) as android.app.ActivityManager)
+			.deviceConfigurationInfo.reqGlEsVersion >= 0x30000
+		if ((prefs.debandingEnabled || prefs.fsr1Enabled) && glEs3) {
+			// Decode at stream resolution, then render optional effects.
 			binding.surfaceView.visibility = View.GONE
 			binding.debandSurfaceView.visibility = View.VISIBLE
-			
-			debandRenderer = DebandRenderer { surface ->
-				viewModel.session.attachToSurface(surface)
-			}
+			val profile = viewModel.session.connectInfo.videoProfile
+			debandRenderer = DebandRenderer(
+				profile.width, profile.height,
+				prefs.debandingEnabled, prefs.fsr1Enabled, prefs.fsr1RcasEnabled,
+				{ binding.debandSurfaceView.requestRender() },
+				{ runOnUiThread { useDirectVideoOutput() } },
+				{ surface -> viewModel.session.attachToSurface(surface) }
+			)
 			
 			binding.debandSurfaceView.setEGLContextClientVersion(3)
 			binding.debandSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0)
 			binding.debandSurfaceView.holder.setFormat(android.graphics.PixelFormat.RGBA_8888)
 			binding.debandSurfaceView.setRenderer(debandRenderer)
 			debandRenderer!!.sharpness = prefs.sharpnessIntensity
-			binding.debandSurfaceView.renderMode = android.opengl.GLSurfaceView.RENDERMODE_CONTINUOUSLY
+			binding.debandSurfaceView.renderMode = android.opengl.GLSurfaceView.RENDERMODE_WHEN_DIRTY
 		} else {
-			// Use standard SurfaceView (no shader processing)
-			binding.surfaceView.visibility = View.VISIBLE
-			binding.debandSurfaceView.visibility = View.GONE
-			viewModel.session.attachToSurfaceView(binding.surfaceView)
+			useDirectVideoOutput()
 		}
+	}
+
+	private fun useDirectVideoOutput() {
+		if (isFinishing || isDestroyed || directOutputAttached) return
+		viewModel.session.detachSurface()
+		debandRenderer?.release()
+		debandRenderer = null
+		binding.debandSurfaceView.visibility = View.GONE
+		binding.surfaceView.visibility = View.VISIBLE
+		viewModel.session.attachToSurfaceView(binding.surfaceView)
+		directOutputAttached = true
 	}
 
 	private var lastFragmentControllerState = com.metallic.chiaki.lib.ControllerState()

@@ -4,6 +4,8 @@
 #define CHIAKI_JNI_VIDEO_DECODER_H
 
 #include <jni.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #include <chiaki/log.h>
 #include <chiaki/thread.h>
@@ -13,12 +15,19 @@ typedef struct ANativeWindow ANativeWindow;
 
 typedef struct android_chiaki_video_decoder_t {
   ChiakiLog *log;
+  ChiakiMutex lifecycle_mutex;
   ChiakiMutex codec_mutex;
   AMediaCodec *codec;
   ANativeWindow *window;
   uint64_t timestamp_cur;
   ChiakiThread output_thread;
   bool shutdown_output;
+  bool output_thread_started;
+  bool output_failed;
+  unsigned int recovery_attempts;
+  unsigned int successful_outputs;
+  uint8_t *codec_header;
+  size_t codec_header_size;
   int32_t target_width;
   int32_t target_height;
   ChiakiCodec target_codec;

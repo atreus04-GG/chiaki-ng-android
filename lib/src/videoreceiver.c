@@ -241,6 +241,12 @@ static ChiakiErrorCode chiaki_video_receiver_flush_frame(ChiakiVideoReceiver *vi
 		{
 			succ = false;
 			CHIAKI_LOGW(video_receiver->log, "Video callback did not process frame successfully.");
+			if(!video_receiver->waiting_for_idr)
+			{
+				stream_connection_send_idr_request(&video_receiver->session->stream_connection);
+				video_receiver->waiting_for_idr = true;
+				CHIAKI_LOGI(video_receiver->log, "Decoder rejected frame, waiting for IDR");
+			}
 		}
 		else
 		{

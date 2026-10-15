@@ -163,6 +163,18 @@
             app:title="@string/preferences_debanding_title"
             app:summary="@string/preferences_debanding_summary"
             app:icon="@drawable/ic_resolution" />
+        <SwitchPreference
+            app:key="@string/preferences_fsr1_key"
+            app:title="@string/preferences_fsr1_title"
+            app:summary="@string/preferences_fsr1_summary"
+            app:defaultValue="false"
+            app:icon="@drawable/ic_resolution" />
+        <SwitchPreference
+            app:key="@string/preferences_fsr1_rcas_key"
+            app:title="@string/preferences_fsr1_rcas_title"
+            app:summary="@string/preferences_fsr1_rcas_summary"
+            app:defaultValue="true"
+            app:dependency="@string/preferences_fsr1_key" />
     </PreferenceCategory>
 
     <PreferenceCategory
