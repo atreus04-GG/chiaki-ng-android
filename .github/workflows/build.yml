@@ -67,11 +67,11 @@ jobs:
         with:
           packages: platform-tools
 
-      - name: Build Debug APK
-        run: cd android && ./gradlew assembleDebug --no-daemon
+      - name: Build Side-by-Side APK
+        run: cd android && ./gradlew assembleSigned --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Custom-Chiaki-APK
-          path: android/app/build/outputs/apk/debug/*.apk
+          name: Chiaki-Signed-Unsigned-APK
+          path: android/app/build/outputs/apk/signed/*.apk

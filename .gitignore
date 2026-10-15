@@ -28,6 +28,7 @@ CMakeSettings.json
 chiaki.rb
 gui/chiaking.rc
 *.jks
+/android/local.properties
 secret.tar
 keystore-env.sh
 compile_commands.json

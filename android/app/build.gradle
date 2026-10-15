@@ -15,7 +15,12 @@ def chiakiVersionMajor = grepVersionComponent(rootCMakeListsContent, "CHIAKI_VER
 def chiakiVersionMinor = grepVersionComponent(rootCMakeListsContent, "CHIAKI_VERSION_MINOR")
 def chiakiVersionPatch = grepVersionComponent(rootCMakeListsContent, "CHIAKI_VERSION_PATCH")
 def chiakiVersion = "$chiakiVersionMajor.$chiakiVersionMinor.$chiakiVersionPatch"
+def ciVersionCode = System.getenv("CI_VERSION_CODE")
+def androidVersionCode = ciVersionCode != null ? Integer.parseInt(ciVersionCode) : 12
 println("Determined Chiaki Version: $chiakiVersion")
+if (ciVersionCode != null) {
+    println("Using CI Android versionCode: $ciVersionCode")
+}
 
 android {
     namespace 'com.metallic.chiaki'
@@ -25,7 +30,7 @@ android {
         applicationId "com.metallic.chiaki"
         minSdk 24
         targetSdk 34
-        versionCode 11
+        versionCode androidVersionCode
         versionName chiakiVersion
         externalNativeBuild {
             cmake {
@@ -68,9 +73,18 @@ android {
         release
     }
     buildTypes {
+        debug {
+        }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        signed {
+            initWith debug
+            signingConfig null
+            applicationIdSuffix ".signed"
+            versionNameSuffix "-signed"
+            resValue "string", "app_name", "Chiaki Signed"
         }
     }
 
@@ -85,6 +99,7 @@ android {
         println("Enabling Local Signing")
         buildTypes.release.signingConfig = signingConfigs.release
         buildTypes.debug.signingConfig = signingConfigs.release
+        buildTypes.signed.signingConfig = signingConfigs.release
         signingConfigs.release.storeFile = file(properties.get("chiakiKeystore"))
         signingConfigs.release.storePassword = properties.get("chiakiKeystorePW")
         signingConfigs.release.keyAlias = properties.get("chiakiKeyAlias")
