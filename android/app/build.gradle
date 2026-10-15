@@ -25,7 +25,7 @@ android {
         applicationId "com.metallic.chiaki"
         minSdk 24
         targetSdk 34
-        versionCode 11
+        versionCode 12
         versionName chiakiVersion
         externalNativeBuild {
             cmake {
@@ -68,6 +68,11 @@ android {
         release
     }
     buildTypes {
+        migration {
+            initWith debug
+            signingConfig null
+            versionNameSuffix "-migration"
+        }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
